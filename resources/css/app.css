@@ -1,0 +1,27 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 1rem;
+    padding: 0rem;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #38332d;
+    color:#9eb6f9;
+}
+
+.header {
+    flex: 0 1 auto;
+    padding: 1rem;
+}
+
+.content {
+    flex: 1 1 auto;
+}
+
+.footer {
+    flex: 0 1 auto;
+    padding: 1rem;
+}

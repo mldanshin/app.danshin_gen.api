@@ -1,0 +1,26 @@
+parameters:
+	paths:
+		- app
+	level: 8
+	ignoreErrors:
+		- 	message: '#Access to an undefined property#'
+		- 	message: '#Call to an undefined method#'
+		- 	message: '#Call to an undefined static method#'
+		-
+			message: '#Illuminate\\Contracts\\View\\Factory#'
+			path: app/Http/Controllers/*
+		-
+			message: '#.+#'
+			paths: 
+				-	app/Console/Kernel.php
+				-	app/Exceptions/Handler.php
+				-	app/Http/Kernel.php
+				-	app/Http/Middleware/Authenticate.php
+				-	app/Http/Middleware/CheckForMaintenanceMode.php
+				-	app/Http/Middleware/EncryptCookies.php
+				-	app/Http/Middleware/PreventRequestsDuringMaintenance.php
+				-	app/Http/Middleware/RedirectIfAuthenticated.php
+				-	app/Http/Middleware/TrimStrings.php
+				-	app/Http/Middleware/TrustHosts.php
+				-	app/Http/Middleware/TrustProxies.php
+				-	app/Http/Middleware/VerifyCsrfToken.php

@@ -1,0 +1,2 @@
+php vendor/bin/openapi app -o openapi.yaml
+php artisan l5-swagger:generate
