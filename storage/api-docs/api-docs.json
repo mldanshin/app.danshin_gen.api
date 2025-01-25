@@ -1,0 +1,3033 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Api Danshin Genealogy",
+        "description": "Доступ к большенству данных только через API токен,\n        в противном случае будет возвращаться ошибка 401.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/dates": {
+            "get": {
+                "description": "Список всех известных дат (день рождения, день памяти). Под известными понимаются даты, с полными данными о дне, месяце, годе. Например дата 2000-11-1? не попадёт, из-за неизевстного дня.",
+                "operationId": "fdfd1a1676f59139ddc326a711ca3bef",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/datesDate"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    }
+                }
+            }
+        },
+        "/api/dates/upcoming": {
+            "get": {
+                "description": "Список ближайших дат (предыдущие дни, текущий день, будущие дни, в соответтвии с переданными параметрами).",
+                "operationId": "4bbd43443fba95f7662a6111cbb24add",
+                "parameters": [
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Текущее число в формате гггг-мм-дд",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "past_day",
+                        "in": "query",
+                        "description": "Количество предшествующих дней (число от 1 до 30).",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "nearest_day",
+                        "in": "query",
+                        "description": "Количество будующих дней (число от 1 до 30).",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/datesEvents"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса"
+                    }
+                }
+            }
+        },
+        "/api/download/people": {
+            "get": {
+                "description": "Файл-документ, содержащий всех лиц родословной.",
+                "operationId": "10b720343e2ee730f9dbc16ac71b7fac",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Формат файла.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pdf",
+                                "odt"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            },
+                            "application/odt": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "302": {
+                        "description": "Не указан формат файла в параметрах запроса."
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Файл в переданном формате не найден (не поддерживается)."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/download/person/{id}": {
+            "get": {
+                "description": "Файл-документ, содержащий лицо с переданным id.",
+                "operationId": "08edc056a1e59b1abb6a825ca6295647",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id запрашиваемого лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Формат файла.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pdf",
+                                "odt"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            },
+                            "application/odt": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "302": {
+                        "description": "Не указан формат файла в параметрах запроса."
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лицо с переданным id не найдено или\n                    файл в переданном формате не поддерживается."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/download/tree/{id}": {
+            "get": {
+                "description": "Файл SVG, содержащий древо лица.",
+                "operationId": "86f7cfe25414a6c4321f42bca696428b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id запрашиваемого лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "parent_id",
+                        "in": "query",
+                        "description": "Id родителя (запрашиваемого лица) по которому строится древо, по умолчанию древо строится по отцу. Id родителя должно иметь тип integer.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/svg": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "302": {
+                        "description": "Параметры запроса не соответствуют ограничениям."
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лицо с переданным id не найдено\n                    или запрошенное лицо не имеет родителя, с переданным parent_id."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/download/db": {
+            "get": {
+                "description": "Файл SQL, содержащий 'dump' базу данных родословной.",
+                "operationId": "d390fd4eec488d49b108bd3c92b6bf19",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/sql": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    }
+                }
+            }
+        },
+        "/api/download/photo": {
+            "get": {
+                "description": "Файл ZIP, содержащий все фотоснимки из родословной.",
+                "operationId": "92560dd3a81b0078b01a2c7e6fd2079b",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/zip": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Фотоснимки на сервере отсутствуют."
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    }
+                }
+            }
+        },
+        "/api/genders": {
+            "get": {
+                "description": "Список допустимых полов лица.",
+                "operationId": "e880e1ff3be8e939c96db9b12b1391df",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Массив с парами ключ+значение, где ключ=Id, а значение=Name пола.",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    }
+                }
+            }
+        },
+        "/api/marriage/roles": {
+            "get": {
+                "description": "Список допустимых ролей в браке (к браку приравнено совместное проживание).",
+                "operationId": "b50ff32bf46f9b9c2ae7fcdbd8bf0491",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Массив с парами ключ+значение, где ключ=id, а значение=name роли.",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    }
+                }
+            }
+        },
+        "/api/marriage/roles/{gender}": {
+            "get": {
+                "description": "Список допустимых ролей (выборка по полу) в браке (к браку приравнено совместное проживание).",
+                "operationId": "1d492c94a9d97e8c3aa459d22467f1cd",
+                "parameters": [
+                    {
+                        "name": "gender",
+                        "in": "path",
+                        "description": "Id gender.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Массив с парами ключ+значение, где ключ=id, а значение=name роли.",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Id запрошенного пола не найдено."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/marriage/possible": {
+            "get": {
+                "description": "Список допустимых лиц для брака (совместного проживания) запрашиваемого лица.",
+                "operationId": "5974afe2609c7669b5163ef42ae9fa2f",
+                "parameters": [
+                    {
+                        "name": "person_id",
+                        "in": "query",
+                        "description": "Id лица (должно существовать в базе данных).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "birth_date",
+                        "in": "query",
+                        "description": "Дата рождения запрашиваемого лица.",
+                        "required": false,
+                        "schema": {
+                            "description": "Дата в формате ГГГГ-ММ-ДД, не должна содержать неизвестные цифры.",
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "role_id",
+                        "in": "query",
+                        "description": "Id роли в браке запрашиваемого лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "parents",
+                        "in": "query",
+                        "description": "Лица, претенденты на роль родителей.",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "properties": {
+                                    "person": {
+                                        "description": "Id person должно существовать в базе данных и не совпадать с запрашиваемым лицом.",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/personEditorMarriagePossible"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/parent/roles": {
+            "get": {
+                "description": "Список допустимых ролей родителей.",
+                "operationId": "abfd3ed308762a0abd3b84f6a37efa71",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Массив с парами ключ+значение, где ключ=id, а значение=name роли.",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    }
+                }
+            }
+        },
+        "/api/parent/possible": {
+            "get": {
+                "description": "Список допустимых родителей для запрошенного лица.",
+                "operationId": "ef7ff83f57cda38905da76935641158c",
+                "parameters": [
+                    {
+                        "name": "person_id",
+                        "in": "query",
+                        "description": "Id запрашиваемого лица.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "birth_date",
+                        "in": "query",
+                        "description": "Дата рождения запрашиваемого лица.",
+                        "required": false,
+                        "schema": {
+                            "description": "Дата в формате ГГГГ-ММ-ДД, не должна содержать неизвестные цифры.",
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "role_id",
+                        "in": "query",
+                        "description": "Id роли для родителя.",
+                        "required": true
+                    },
+                    {
+                        "name": "mariages",
+                        "in": "query",
+                        "description": "Лица, претенденты на роль в браке (сожительстве).",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "properties": {
+                                    "person": {
+                                        "description": "Id person должно существовать в базе данных и не совпадать с запрашиваемым лицом.",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/personEditorPersonShort"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/people": {
+            "get": {
+                "description": "Список всех лиц с кратким описанием.",
+                "operationId": "a2076bd049550892f60380607e3dacc2",
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Ключевое слово для упорядочивания списка. По умолчанию 'name'",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "age",
+                                "name"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Строка поиска.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/peoplePerson"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/person/create": {
+            "get": {
+                "description": "Создание нового лица",
+                "operationId": "f9b1703efa49c2f6004014838cb7de2f",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/personEditorCreatedPerson"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    }
+                }
+            }
+        },
+        "/api/person": {
+            "post": {
+                "description": "Сохранение нового лица. Сначала сохраните фотоснимки лица, получив имена файлов, которые нужно передать в данному запросе.",
+                "operationId": "e3fa321f1f16f618321269761b9dce45",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "is_unavailable",
+                                    "is_live",
+                                    "gender"
+                                ],
+                                "properties": {
+                                    "is_unavailable": {
+                                        "description": "Доступность лица (поддерживается связь, поступает о нём известна информация).",
+                                        "type": "boolean"
+                                    },
+                                    "is_live": {
+                                        "description": "Статус живой или нет.Не должно противоречить полю death_date.",
+                                        "type": "boolean"
+                                    },
+                                    "gender": {
+                                        "description": "Id пола (из допустимых значений в БД).",
+                                        "type": "integer"
+                                    },
+                                    "surname": {
+                                        "description": "Фамилия.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "old_surname": {
+                                        "description": "Прежние фамилии с порядковыми номерами.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "surname",
+                                                "order"
+                                            ],
+                                            "properties": {
+                                                "surname": {
+                                                    "description": "Фамилия.",
+                                                    "type": "string"
+                                                },
+                                                "order": {
+                                                    "description": "Порядковый номер.",
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "name": {
+                                        "description": "Имя.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "patronymic": {
+                                        "description": "Отчество. Не должно противоречить has_patronymic.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "has_patronymic": {
+                                        "description": "Имеется ли отчество (по умолчанию отчество предполагается).",
+                                        "type": "boolean"
+                                    },
+                                    "birth_date": {
+                                        "description": "Дата рождения в формате гггг-мм-дд, вместо неизвестных цифр допустим символ ?",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "birth_place": {
+                                        "description": "Место рождения.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "death_date": {
+                                        "description": "Дата смерти в формате гггг-мм-дд, вместо неизвестных цифр допустим символ ?",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "burial_place": {
+                                        "description": "Место захоронения.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "note": {
+                                        "description": "Примечание.",
+                                        "type": "string"
+                                    },
+                                    "activities": {
+                                        "description": "Род деятельности (работа, предпринимательство, увлечения).",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "": {
+                                                    "type": "string",
+                                                    "maxLength": 255,
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "emails": {
+                                        "description": "Адреса электронной почты.",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "maxLength": 255,
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "internet": {
+                                        "description": "Интернет ресурсы (страницы в соц.сетях, личные сайты).",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "name",
+                                                "url"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "description": "Наименование",
+                                                    "type": "string",
+                                                    "maxLength": 255,
+                                                    "uniqueItems": true
+                                                },
+                                                "url": {
+                                                    "description": "URL ссылка",
+                                                    "type": "string",
+                                                    "format": "url",
+                                                    "maxLength": 255,
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "phones": {
+                                        "description": "Телефоны (должен состоять из 10 цифр).",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "": {
+                                                    "type": "string",
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "residences": {
+                                        "description": "Места проживания.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "name"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "description": "Наименование",
+                                                    "type": "string",
+                                                    "maxLength": 255
+                                                },
+                                                "date": {
+                                                    "description": "Дата актуальности данных.В формате ГГГГ-ММ-ДД, допустимо заменять на ?",
+                                                    "type": "string",
+                                                    "format": "date"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "parents": {
+                                        "description": "Родители.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "person",
+                                                "role"
+                                            ],
+                                            "properties": {
+                                                "person": {
+                                                    "description": "Id родителя. Должен сущестовать в БД.",
+                                                    "type": "integer"
+                                                },
+                                                "role": {
+                                                    "description": "Id роли родителя. Должна сущестовать в БД.",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "marriages": {
+                                        "description": "Брак (совместное проживание).",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "role",
+                                                "soulmate",
+                                                "soulmate_role"
+                                            ],
+                                            "properties": {
+                                                "role": {
+                                                    "description": "Id роли лица. Должна сущестовать в БД.",
+                                                    "type": "integer"
+                                                },
+                                                "soulmate": {
+                                                    "description": "Id второго лица. Должен сущестовать в БД.",
+                                                    "type": "integer"
+                                                },
+                                                "soulmate_role": {
+                                                    "description": "Id роли второго лица. Должна сущестовать в БД.",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "photo": {
+                                        "description": "Фото.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "order",
+                                                "file"
+                                            ],
+                                            "properties": {
+                                                "order": {
+                                                    "description": "Порядковый номер.",
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "uniqueItems": true
+                                                },
+                                                "date": {
+                                                    "description": "Дата снимка. В формате ГГГГ-ММ-ДД, возможно заменить символ на ?",
+                                                    "type": "string",
+                                                    "format": "date"
+                                                },
+                                                "file": {
+                                                    "description": "Файл.",
+                                                    "type": "string",
+                                                    "format": "binary"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "": {
+                                            "description": "Id созданного лица.",
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/person/{id}": {
+            "get": {
+                "description": "Лицо для 'чтения'",
+                "operationId": "61b1d22e25fb2fecacff38a32de405fd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id запрашиваемого лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Дата в формате гггг-мм-дд,\n                    от которой будет идти отсчёт возраста лица и других сведений.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/personReaderPerson"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лицо с запрошенным id не существует."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            },
+            "put": {
+                "description": "Сохранение изменённого лица. Сначала сохраните фотоснимки лица, получив имена файлов, которые нужно передать в данному запросе.",
+                "operationId": "1a7473b83a56b2325d2df07319dd3140",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id запрашиваемого лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "is_unavailable",
+                                    "is_live",
+                                    "gender"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "description": "Id лица (должно существовать в БД).",
+                                        "type": "integer"
+                                    },
+                                    "is_unavailable": {
+                                        "description": "Доступность лица (поддерживается связь, поступает о нём известна информация).",
+                                        "type": "boolean"
+                                    },
+                                    "is_live": {
+                                        "description": "Статус живой или нет.Не должно противоречить полю death_date.",
+                                        "type": "boolean"
+                                    },
+                                    "gender": {
+                                        "description": "Id пола (из допустимых значений в БД).",
+                                        "type": "integer"
+                                    },
+                                    "surname": {
+                                        "description": "Фамилия.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "old_surname": {
+                                        "description": "Прежние фамилии с порядковыми номерами.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "surname",
+                                                "order"
+                                            ],
+                                            "properties": {
+                                                "surname": {
+                                                    "description": "Фамилия.",
+                                                    "type": "string"
+                                                },
+                                                "order": {
+                                                    "description": "Порядковый номер.",
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "name": {
+                                        "description": "Имя.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "patronymic": {
+                                        "description": "Отчество. Не должно противоречить has_patronymic.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "has_patronymic": {
+                                        "description": "Имеется ли отчество (по умолчанию отчество предполагается).",
+                                        "type": "boolean"
+                                    },
+                                    "birth_date": {
+                                        "description": "Дата рождения в формате гггг-мм-дд, вместо неизвестных цифр допустим символ ?",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "birth_place": {
+                                        "description": "Место рождения.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "death_date": {
+                                        "description": "Дата смерти в формате гггг-мм-дд, вместо неизвестных цифр допустим символ ?",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "burial_place": {
+                                        "description": "Место захоронения.",
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "note": {
+                                        "description": "Примечание.",
+                                        "type": "string"
+                                    },
+                                    "activities": {
+                                        "description": "Род деятельности (работа, предпринимательство, увлечения).",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "": {
+                                                    "type": "string",
+                                                    "maxLength": 255,
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "emails": {
+                                        "description": "Адреса электронной почты.",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "maxLength": 255,
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "internet": {
+                                        "description": "Интернет ресурсы (страницы в соц.сетях, личные сайты).",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "name",
+                                                "url"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "description": "Наименование",
+                                                    "type": "string",
+                                                    "maxLength": 255,
+                                                    "uniqueItems": true
+                                                },
+                                                "url": {
+                                                    "description": "URL ссылка",
+                                                    "type": "string",
+                                                    "format": "url",
+                                                    "maxLength": 255,
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "phones": {
+                                        "description": "Телефоны (должен состоять из 10 цифр).",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "": {
+                                                    "type": "string",
+                                                    "uniqueItems": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "residences": {
+                                        "description": "Места проживания.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "name"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "description": "Наименование",
+                                                    "type": "string",
+                                                    "maxLength": 255
+                                                },
+                                                "date": {
+                                                    "description": "Дата актуальности данных.В формате ГГГГ-ММ-ДД, допустимо заменять на ?",
+                                                    "type": "string",
+                                                    "format": "date"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "parents": {
+                                        "description": "Родители.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "person",
+                                                "role"
+                                            ],
+                                            "properties": {
+                                                "person": {
+                                                    "description": "Id родителя. Должен сущестовать в БД.",
+                                                    "type": "integer"
+                                                },
+                                                "role": {
+                                                    "description": "Id роли родителя. Должна сущестовать в БД.",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "marriages": {
+                                        "description": "Брак (совместное проживание).",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "role",
+                                                "soulmate",
+                                                "soulmate_role"
+                                            ],
+                                            "properties": {
+                                                "role": {
+                                                    "description": "Id роли лица. Должна сущестовать в БД.",
+                                                    "type": "integer"
+                                                },
+                                                "soulmate": {
+                                                    "description": "Id второго лица. Должен сущестовать в БД.",
+                                                    "type": "integer"
+                                                },
+                                                "soulmate_role": {
+                                                    "description": "Id роли второго лица. Должна сущестовать в БД.",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "photo": {
+                                        "description": "Фото.",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "order",
+                                                "file"
+                                            ],
+                                            "properties": {
+                                                "order": {
+                                                    "description": "Порядковый номер.",
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "uniqueItems": true
+                                                },
+                                                "date": {
+                                                    "description": "Дата снимка. В формате ГГГГ-ММ-ДД, возможно заменить символ на ?",
+                                                    "type": "string",
+                                                    "format": "date"
+                                                },
+                                                "file": {
+                                                    "description": "Файл.",
+                                                    "type": "string",
+                                                    "format": "binary"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "": {
+                                            "description": "Id изменённого лица.",
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лицо с запрошенным id не существует."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/person/{id}/edit": {
+            "get": {
+                "description": "Лицо для 'изменения'",
+                "operationId": "4a39e053ac92c3619301a49eb0f7386a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id запрашиваемого лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/personEditorEditablePerson"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лицо с запрошенным id не существует."
+                    }
+                }
+            }
+        },
+        "/api/person/{person}": {
+            "delete": {
+                "description": "Удаление лица",
+                "operationId": "7bdd37bc29912ea475ed61037331cb41",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id запрашиваемого лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. Пустой json.",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лицо с запрошенным id не существует."
+                    }
+                }
+            }
+        },
+        "/api/person-photo/{personId}": {
+            "get": {
+                "description": "Массив описаний фотоснимков для лица (!!!не файлы).",
+                "operationId": "43bfe400bc66e3290f33b09279d855bb",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "in": "path",
+                        "description": "Id лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/personReaderPhoto"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лица с переданным id не найдено."
+                    }
+                }
+            }
+        },
+        "/api/photo/{personId}/{fileName}": {
+            "get": {
+                "description": "Файл фотографии (бинарный).",
+                "operationId": "81c977c2583795ca1aa193b9b186968e",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "in": "path",
+                        "description": "Id лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "fileName",
+                        "in": "path",
+                        "description": "Имя файла фото.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "image/jpg": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Фото с переданными параметрами не найдено."
+                    }
+                }
+            }
+        },
+        "/api/photo/temp": {
+            "post": {
+                "description": "Сохранить файл фотоснимка во временное хранилище",
+                "operationId": "989058617c3b1d1cfd4323959b4933ab",
+                "responses": {
+                    "200": {
+                        "description": "OK. ",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "": {
+                                            "description": "Имя файла в поле fileName",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    }
+                }
+            }
+        },
+        "/api/tree/model/{id}": {
+            "get": {
+                "description": "Модель древа запрашиваемого лица.",
+                "operationId": "a9e497e90504ecfe429c4e6b0fc10e97",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id лица",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "parent_id",
+                        "in": "query",
+                        "description": "Id родителя (запрашиваемого лица) по которому строится древо,\n                    по умолчанию древо строится случайным образом по отцу или матери.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/treeTree"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лица с переданным id не найдено."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/tree/image/{id}": {
+            "get": {
+                "description": "Файл SVG, содержащий древо запрашиваемого лица.",
+                "operationId": "178879ccc218f6c988c26e0b3e120227",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id запрашиваемого лица",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "parent_id",
+                        "in": "query",
+                        "description": "Id родителя (запрашиваемого лица) по которому строится древо,\n                    по умолчанию древо строится случайным образом по отцу или матери.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "image/svg+xml": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лица с переданным id не найдено."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/tree/image-interactive/{id}": {
+            "get": {
+                "description": "Файл изображения, содержащий древо запрашиваемого лица, содержащий интерактивные ссылки в древе. Ссылка на лицо должна соответствовать шаблону path_person/person_id, где path - путь к древу, person_id - id номер запрашиваемого лица, то есть Вы предоставляете path, к которому настоящее API добавляет id лица. Ссылка на древо лица должна соответствовать шаблону path_tree/person_id. Также Вы должны предоставить пути к двум изображениям (image_person и image_tree), которые будут использоваться в ссылке.",
+                "operationId": "8cf161956d59d8917405007bbcaf2900",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id запрашиваемого лица",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "parent_id",
+                        "in": "query",
+                        "description": "Id родителя (запрашиваемого лица) по которому строится древо,\n                    по умолчанию древо строится случайным образом по отцу или матери.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "path_person",
+                        "in": "query",
+                        "description": "Путь к лицу.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "path_tree",
+                        "in": "query",
+                        "description": "Путь к древу лица.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "image_person",
+                        "in": "query",
+                        "description": "Путь к изображению, используемому в ссылке.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "image_tree",
+                        "in": "query",
+                        "description": "Путь к изображению, используемому в ссылке.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "image/svg+xml": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лица с переданным id не найдено."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        },
+        "/api/tree/toggle/{id}": {
+            "get": {
+                "description": "Переключатель для древа. Выбор родителя, по которому строится древо.",
+                "operationId": "ef419dfded6c6beba9db66a8b4daa6e3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id запрашиваемого лица",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "parent_id",
+                        "in": "query",
+                        "description": "Id родителя (запрашиваемого лица) по которому строится древо,\n                    по умолчанию древо строится случайным образом по отцу или матери.\n                    Id родителя должно иметь тип integer.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/treeToggle"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация через токен"
+                    },
+                    "404": {
+                        "description": "Лицо с запрошенным id не существует\n                    или запрошенное лицо не имеет родителя, с переданным parent_id."
+                    },
+                    "422": {
+                        "description": "Неверные параметры запроса."
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "dateInterval": {
+                "required": [
+                    "y",
+                    "m",
+                    "d"
+                ],
+                "properties": {
+                    "y": {
+                        "description": "Год",
+                        "type": "integer"
+                    },
+                    "m": {
+                        "description": "Месяц",
+                        "type": "integer"
+                    },
+                    "d": {
+                        "description": "День",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "date": {
+                "title": "Дата.",
+                "required": [
+                    "hasUnknown",
+                    "isEmpty"
+                ],
+                "properties": {
+                    "year": {
+                        "description": "Год.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "month": {
+                        "description": "Месяц.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "day": {
+                        "description": "День.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "hasUnknown": {
+                        "description": "Является ли дата неизестной. Дата неизвестна, если год или месяц или день, имеют хотя бы одну известную цифру. Неизвестные данные будут заменены на ? (вопросительный знак). ",
+                        "type": "boolean"
+                    },
+                    "isEmpty": {
+                        "description": "Является ли дата пустой. Дата пустая, если год и месяц и день пустые (проверка каждого элемента на empty() == true).",
+                        "type": "boolean"
+                    },
+                    "string": {
+                        "description": "Строка даты в формате YYYY-MM-DD.",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "datesBirth": {
+                "title": "День рождения.",
+                "required": [
+                    "date",
+                    "person",
+                    "age"
+                ],
+                "properties": {
+                    "date": {
+                        "$ref": "#/components/schemas/date"
+                    },
+                    "person": {
+                        "$ref": "#/components/schemas/datesPerson"
+                    },
+                    "age": {
+                        "$ref": "#/components/schemas/dateInterval"
+                    }
+                },
+                "type": "object"
+            },
+            "datesBirthWould": {
+                "title": "День рождения умершего лица.",
+                "required": [
+                    "date",
+                    "person",
+                    "age"
+                ],
+                "properties": {
+                    "date": {
+                        "$ref": "#/components/schemas/date"
+                    },
+                    "person": {
+                        "$ref": "#/components/schemas/datesPerson"
+                    },
+                    "age": {
+                        "$ref": "#/components/schemas/dateInterval"
+                    }
+                },
+                "type": "object"
+            },
+            "datesDate": {
+                "title": "Дата события.",
+                "required": [
+                    "date",
+                    "type",
+                    "person"
+                ],
+                "properties": {
+                    "date": {
+                        "$ref": "#/components/schemas/date"
+                    },
+                    "type": {
+                        "description": "Тип даты.",
+                        "type": "App\\Models\\Dates\\DateType",
+                        "enum": [
+                            1,
+                            2
+                        ]
+                    },
+                    "person": {
+                        "$ref": "#/components/schemas/datesPerson"
+                    }
+                },
+                "type": "object"
+            },
+            "datesDeath": {
+                "title": "День смерти.",
+                "required": [
+                    "date",
+                    "person",
+                    "interval"
+                ],
+                "properties": {
+                    "date": {
+                        "$ref": "#/components/schemas/date"
+                    },
+                    "person": {
+                        "$ref": "#/components/schemas/datesPerson"
+                    },
+                    "age": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/dateInterval"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Возраст (объект DateInterval).",
+                        "type": "DateInterval"
+                    },
+                    "interval": {
+                        "$ref": "#/components/schemas/dateInterval"
+                    }
+                },
+                "type": "object"
+            },
+            "datesEvents": {
+                "title": "Список ближайших событий.",
+                "required": [
+                    "pastBirth",
+                    "pastBirthWould",
+                    "pastDeath",
+                    "todayBirth",
+                    "todayBirthWould",
+                    "todayDeath",
+                    "nearestBirth",
+                    "nearestBirthWould",
+                    "nearestDeath",
+                    "isEmpty"
+                ],
+                "properties": {
+                    "pastBirth": {
+                        "description": "Прошедшие дни рождения живых лиц.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/datesBirth"
+                        }
+                    },
+                    "pastBirthWould": {
+                        "description": "Прошедшие дни рождения умерших лиц.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/datesBirthWould"
+                        }
+                    },
+                    "pastDeath": {
+                        "description": "Прошедшие дни памяти умерших лиц.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/datesDeath"
+                        }
+                    },
+                    "todayBirth": {
+                        "description": "Текущие дни рождения живых лиц.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/datesBirth"
+                        }
+                    },
+                    "todayBirthWould": {
+                        "description": "Текущие дни рождения умерших лиц.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/datesBirthWould"
+                        }
+                    },
+                    "todayDeath": {
+                        "description": "Текущие дни памяти умерших лиц.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/datesDeath"
+                        }
+                    },
+                    "nearestBirth": {
+                        "description": "Будующие дни рождения живых лиц.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/datesBirth"
+                        }
+                    },
+                    "nearestBirthWould": {
+                        "description": "Будующие дни рождения умерших лиц.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/datesBirthWould"
+                        }
+                    },
+                    "nearestDeath": {
+                        "description": "Будущие дни памяти умерших лиц.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/datesDeath"
+                        }
+                    },
+                    "isEmpty": {
+                        "description": "Отсутствуют ли события.",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "datesPerson": {
+                "title": "Лицо, связанное с событием.",
+                "required": [
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Id",
+                        "type": "integer"
+                    },
+                    "surname": {
+                        "description": "Фамилия",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "oldSurname": {
+                        "description": "Прежнии фамилии",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Имя",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patronymic": {
+                        "description": "Отчество",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "peoplePerson": {
+                "title": "Описание лица",
+                "required": [
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID.",
+                        "type": "integer"
+                    },
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "oldSurname": {
+                        "description": "Прежние фамилии.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Имя.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patronymic": {
+                        "description": "Отчество.",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorCreatedInternet": {
+                "title": "Интернет ресурсы.",
+                "required": [
+                    "url",
+                    "name"
+                ]
+            },
+            "personEditorCreatedMarriage": {
+                "title": "Брак (совместное проживание).",
+                "required": [
+                    "roleCurrent",
+                    "soulmate",
+                    "roleSoulmate"
+                ],
+                "properties": {
+                    "role": {
+                        "description": "Id роли текущего лица.",
+                        "type": "integer"
+                    },
+                    "soulmate": {
+                        "description": "Id второго лица.",
+                        "type": "integer"
+                    },
+                    "soulmateRole": {
+                        "description": "Id роли второго лица.",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorCreatedOldSurname": {
+                "title": "Прежние фамилии.",
+                "required": [
+                    "surname",
+                    "order"
+                ],
+                "properties": {
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string"
+                    },
+                    "order": {
+                        "description": "Порядковый номер.",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorCreatedParentModel": {
+                "title": "Родитель.",
+                "required": [
+                    "person",
+                    "role"
+                ],
+                "properties": {
+                    "person": {
+                        "description": "Id лица",
+                        "type": "integer"
+                    },
+                    "role": {
+                        "description": "Id роли.",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorCreatedPerson": {
+                "title": "Новое лицо.",
+                "required": [
+                    "isUnavailable",
+                    "isLive",
+                    "gender",
+                    "hasPatronymic"
+                ],
+                "properties": {
+                    "isUnavailable": {
+                        "description": "Доступное ли лицо для связи.",
+                        "type": "boolean"
+                    },
+                    "isLive": {
+                        "description": "Является лицо живым или нет.",
+                        "type": "boolean"
+                    },
+                    "gender": {
+                        "description": "Пол.",
+                        "type": "integer"
+                    },
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "oldSurname": {
+                        "description": "Прежние фамилии.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorCreatedOldSurname"
+                        },
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Имя.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patronymic": {
+                        "description": "Отчество.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "birthDate": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата рождения."
+                    },
+                    "birthPlace": {
+                        "description": "Место рождения.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "deathDate": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата смерти."
+                    },
+                    "burialPlace": {
+                        "description": "Место захоронения.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "note": {
+                        "description": "Примечание.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "activities": {
+                        "description": "Виды деятельности.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "emails": {
+                        "description": "Электронная почта.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "internet": {
+                        "description": "Интернет ресурсы.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorCreatedInternet"
+                        },
+                        "nullable": true
+                    },
+                    "phones": {
+                        "description": "Телефоны.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "residences": {
+                        "description": "Места проживания.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorCreatedResidence"
+                        },
+                        "nullable": true
+                    },
+                    "parents": {
+                        "description": "Родители.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorCreatedParentModel"
+                        },
+                        "nullable": true
+                    },
+                    "marriages": {
+                        "description": "Брак (совместное проживание).",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorCreatedMarriage"
+                        },
+                        "nullable": true
+                    },
+                    "hasPatronymic": {
+                        "description": "Имеется ли у лица отчество.",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorCreatedResidence": {
+                "title": "Место проживания.",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Описание.",
+                        "type": "string"
+                    },
+                    "date": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата."
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorEditableInternet": {
+                "title": "Интернет ресурсы.",
+                "required": [
+                    "url",
+                    "name"
+                ],
+                "properties": {
+                    "url": {
+                        "description": "Url.",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Наименование.",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorEditableMarriage": {
+                "title": "Брак (совместное проживание).",
+                "required": [
+                    "role",
+                    "soulmate",
+                    "soulmateRole"
+                ],
+                "properties": {
+                    "role": {
+                        "description": "Id роли текущего лица.",
+                        "type": "integer"
+                    },
+                    "soulmate": {
+                        "description": "Id второго лица.",
+                        "type": "integer"
+                    },
+                    "soulmateRole": {
+                        "description": "Id роли второго лица.",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorEditableOldSurname": {
+                "title": "Прежние фамилии.",
+                "required": [
+                    "surname",
+                    "order"
+                ],
+                "properties": {
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string"
+                    },
+                    "order": {
+                        "description": "Порядковый номер.",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorEditableParentModel": {
+                "title": "Родитель.",
+                "required": [
+                    "person",
+                    "role"
+                ],
+                "properties": {
+                    "person": {
+                        "description": "Id лица.",
+                        "type": "integer"
+                    },
+                    "role": {
+                        "description": "Id роли.",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorEditablePerson": {
+                "title": "Лицо для редактирования.",
+                "required": [
+                    "id",
+                    "isUnavailable",
+                    "isLive",
+                    "gender",
+                    "hasPatronymic"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Id.",
+                        "type": "integer"
+                    },
+                    "isUnavailable": {
+                        "description": "Доступное ли лицо для связи.",
+                        "type": "boolean"
+                    },
+                    "isLive": {
+                        "description": "Является лицо живым или нет.",
+                        "type": "boolean"
+                    },
+                    "gender": {
+                        "description": "Пол.",
+                        "type": "integer"
+                    },
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "oldSurname": {
+                        "description": "Прежние фамилии.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorEditableOldSurname"
+                        },
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Имя.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patronymic": {
+                        "description": "Отчество.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "birthDate": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата рождения."
+                    },
+                    "birthPlace": {
+                        "description": "Место рождения.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "deathDate": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата смерти."
+                    },
+                    "burialPlace": {
+                        "description": "Место захоронения.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "note": {
+                        "description": "Примечание.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "activities": {
+                        "description": "Виды деятельности.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "emails": {
+                        "description": "Электронная почта.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "internet": {
+                        "description": "Интернет ресурсы.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorEditableInternet"
+                        },
+                        "nullable": true
+                    },
+                    "phones": {
+                        "description": "Телефоны.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "residences": {
+                        "description": "Места проживания.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorEditableResidence"
+                        },
+                        "nullable": true
+                    },
+                    "parents": {
+                        "description": "Родители.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorEditableParentModel"
+                        },
+                        "nullable": true
+                    },
+                    "marriages": {
+                        "description": "Брак (совместное проживание).",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorEditableMarriage"
+                        },
+                        "nullable": true
+                    },
+                    "photo": {
+                        "description": "Фото.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorEditablePhoto"
+                        },
+                        "nullable": true
+                    },
+                    "hasPatronymic": {
+                        "description": "Имеется ли у лица отчество.",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorEditablePhoto": {
+                "title": "Интернет ресурсы.",
+                "required": [
+                    "order",
+                    "fileName"
+                ],
+                "properties": {
+                    "order": {
+                        "description": "Порядковый номер.",
+                        "type": "integer"
+                    },
+                    "fileName": {
+                        "description": "Имя файла.",
+                        "type": "string"
+                    },
+                    "date": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата снимка."
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorEditableResidence": {
+                "title": "Место проживания.",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Наименование.",
+                        "type": "string"
+                    },
+                    "date": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата актуальности данных."
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorMarriagePossible": {
+                "title": "Возможные вторые половины и их роль.",
+                "required": [
+                    "role",
+                    "people"
+                ],
+                "properties": {
+                    "role": {
+                        "description": "Роль второй половины",
+                        "type": "integer"
+                    },
+                    "people": {
+                        "description": "Допустимые вторые половины.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personEditorPersonShort"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "personEditorPersonShort": {
+                "title": "Описание лица.",
+                "required": [
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID.",
+                        "type": "integer"
+                    },
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "oldSurname": {
+                        "description": "Прежние фамилии.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Имя.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patronymic": {
+                        "description": "Отчество.",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "personReaderInternet": {
+                "title": "Интернет ресурсы.",
+                "required": [
+                    "url",
+                    "name"
+                ],
+                "properties": {
+                    "url": {
+                        "description": "Url.",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Наименование.",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "personReaderMarriage": {
+                "title": "Брак (совместное проживание).",
+                "required": [
+                    "soulmate",
+                    "role"
+                ],
+                "properties": {
+                    "soulmate": {
+                        "$ref": "#/components/schemas/personReaderPersonShort"
+                    },
+                    "role": {
+                        "description": "Id роли второго лица.",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "personReaderParentModel": {
+                "title": "Родитель.",
+                "required": [
+                    "person",
+                    "role"
+                ],
+                "properties": {
+                    "person": {
+                        "$ref": "#/components/schemas/personReaderPersonShort"
+                    },
+                    "role": {
+                        "description": "Id роли родителя.",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "personReaderPerson": {
+                "title": "Лицо для 'чтения'.",
+                "required": [
+                    "id",
+                    "isUnavailable",
+                    "gender"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Id.",
+                        "type": "integer"
+                    },
+                    "isUnavailable": {
+                        "description": "Доступное ли лицо для связи.",
+                        "type": "boolean"
+                    },
+                    "gender": {
+                        "description": "Пол.",
+                        "type": "integer"
+                    },
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "oldSurname": {
+                        "description": "Прежние фамилии.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Имя.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patronymic": {
+                        "description": "Отчество.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "birthDate": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата рождения."
+                    },
+                    "birthPlace": {
+                        "description": "Место рождения.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "deathDate": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата смерти."
+                    },
+                    "burialPlace": {
+                        "description": "Место захоронения.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "note": {
+                        "description": "Примечание.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "activities": {
+                        "description": "Виды деятельности.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "emails": {
+                        "description": "Электронная почта.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "internet": {
+                        "description": "Интернет ресурсы.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personReaderInternet"
+                        },
+                        "nullable": true
+                    },
+                    "phones": {
+                        "description": "Телефоны.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "residences": {
+                        "description": "Места проживания.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personReaderResidence"
+                        },
+                        "nullable": true
+                    },
+                    "parents": {
+                        "description": "Родители.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personReaderParentModel"
+                        },
+                        "nullable": true
+                    },
+                    "marriages": {
+                        "description": "Брак (совместное проживание).",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personReaderMarriage"
+                        },
+                        "nullable": true
+                    },
+                    "children": {
+                        "description": "Дети.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personReaderPersonShort"
+                        },
+                        "nullable": true
+                    },
+                    "brothersSisters": {
+                        "description": "Братья и сёстра.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personReaderPersonShort"
+                        },
+                        "nullable": true
+                    },
+                    "photo": {
+                        "description": "Фото.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/personReaderPhoto"
+                        },
+                        "nullable": true
+                    },
+                    "age": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/dateInterval"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Возраст (объект DateInterval).",
+                        "type": "DateInterval"
+                    },
+                    "deathDateInterval": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/dateInterval"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Интервал с даты смерти (объект DateInterval).",
+                        "type": "DateInterval"
+                    }
+                },
+                "type": "object"
+            },
+            "personReaderPersonShort": {
+                "title": "Родитель.",
+                "required": [
+                    "person",
+                    "role"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Id.",
+                        "type": "integer"
+                    },
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "oldSurname": {
+                        "description": "Прежние фамилии.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Имя.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patronymic": {
+                        "description": "Отчество.",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "personReaderPhoto": {
+                "title": "Описание фотоснимка",
+                "required": [
+                    "order",
+                    "fileName"
+                ],
+                "properties": {
+                    "order": {
+                        "description": "Порядковый номер фотоснимка.",
+                        "type": "integer"
+                    },
+                    "fileName": {
+                        "description": "Имя файла.",
+                        "type": "string"
+                    },
+                    "date": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата."
+                    }
+                },
+                "type": "object"
+            },
+            "personReaderResidence": {
+                "title": "Место проживания.",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Наименование.",
+                        "type": "string"
+                    },
+                    "date": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата актуальности данных."
+                    }
+                },
+                "type": "object"
+            },
+            "treeFamily": {
+                "title": "Семья.",
+                "required": [
+                    "person",
+                    "marriage",
+                    "children"
+                ],
+                "properties": {
+                    "person": {
+                        "$ref": "#/components/schemas/treePerson"
+                    },
+                    "marriage": {
+                        "description": "Брак (совместное проживание).",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/treePerson"
+                        }
+                    },
+                    "children": {
+                        "description": "Дети.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/treeFamily"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "treePerson": {
+                "title": "Описание лица.",
+                "required": [
+                    "id",
+                    "isPersonTarget"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Id.",
+                        "type": "integer"
+                    },
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "oldSurname": {
+                        "description": "Прежние фамилии.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Имя.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patronymic": {
+                        "description": "Отчество.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "birthDate": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата рождения."
+                    },
+                    "deathDate": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/date"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Дата смерти."
+                    },
+                    "isPersonTarget": {
+                        "description": "Является ли лицо, лицом в отношении которого построено древо.",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "treePersonShort": {
+                "title": "Описание лица.",
+                "required": [
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Id лица.",
+                        "type": "integer"
+                    },
+                    "surname": {
+                        "description": "Фамилия.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Имя.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patronymic": {
+                        "description": "Отчество.",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "treeToggle": {
+                "title": "Переключатель для древа (выбор родителя по которому строится древо).",
+                "required": [
+                    "personTarget",
+                    "parentList"
+                ],
+                "properties": {
+                    "personTarget": {
+                        "$ref": "#/components/schemas/treePersonShort"
+                    },
+                    "parentList": {
+                        "description": "Список родителей.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/treePersonShort"
+                        }
+                    },
+                    "parentTarget": {
+                        "description": "Id родителя, по которому строится древо.",
+                        "type": "integer",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "treeTree": {
+                "title": "Древо лица.",
+                "required": [
+                    "personTarget",
+                    "family"
+                ],
+                "properties": {
+                    "personTarget": {
+                        "$ref": "#/components/schemas/treePersonShort"
+                    },
+                    "family": {
+                        "$ref": "#/components/schemas/treeFamily"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}
